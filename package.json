@@ -3,24 +3,45 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "@better-auth/mongo-adapter": "^1.6.25",
+    "@gravity-ui/icons": "^2.21.0",
+    "@heroui/react": "^3.2.2",
+    "@heroui/styles": "^3.2.2",
+    "@phosphor-icons/react": "^2.1.10",
+    "better-auth": "^1.6.25",
+    "date-fns": "^4.4.0",
+    "lucide-react": "^1.33.0",
+    "mongo": "^0.1.0",
     "next": "16.2.11",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "react-hot-toast": "^2.6.0",
+    "react-icons": "^5.7.0",
+    "react-toastify": "^11.1.0",
+    "recharts": "^3.10.1",
+    "stripe": "^22.5.0",
+    "swiper": "^14.0.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "daisyui": "^5.7.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.11",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "brace-expansion": "^2.0.1",
+    "postcss": "^8.4.31",
+    "sharp": "^0.33.5"
   }
 }
