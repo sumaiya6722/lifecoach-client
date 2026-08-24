@@ -48,6 +48,68 @@ export default function LessonDetailsPage({ params }) {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
 
+  // Interactive Feature States
+  const [reportsCount, setReportsCount] = useState(0);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportReason, setReportReason] = useState('Inappropriate content');
+  const [isSubmittingReport, setIsSubmittingReport] = useState(false);
+
+  // Populate initial report count in useEffect
+  useEffect(() => {
+    async function fetchLesson() {
+      try {
+        const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          // ... rest of your state setters
+          setReportsCount(data.reportsCount || 0);
+        }
+      } catch (error) {
+        console.error("Failed to fetch lesson:", error);
+      }
+    }
+    if (id) fetchLesson();
+  }, [id, user?.id, user?.email]);
+
+  // Report Submission Handler
+  const handleReportSubmit = async (e) => {
+    e.preventDefault();
+    const userIdentifier = user?.id || user?.email;
+
+    if (!userIdentifier) {
+      toast.error('Please log in to report a lesson.');
+      return;
+    }
+
+    setIsSubmittingReport(true);
+
+    try {
+      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user?.id,
+          email: user?.email,
+          reason: reportReason,
+        }),
+      });
+
+      if (res.ok) {
+        setReportsCount((prev) => prev + 1);
+        toast.success('Thank you. The report has been sent for review.');
+        setIsReportModalOpen(false);
+        setReportReason('Inappropriate content');
+      } else {
+        toast.error('Failed to submit report.');
+      }
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      toast.error('An error occurred while reporting.');
+    } finally {
+      setIsSubmittingReport(false);
+    }
+  };
+
   // Fetch lesson data and existing interactions on mount
   useEffect(() => {
     async function fetchLesson() {
@@ -164,13 +226,17 @@ export default function LessonDetailsPage({ params }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: temporaryText,
-          createdAt: new Date().toISOString(),
+          userEmail: user?.email || 'Anonymous',
+          userName: user?.name || user?.displayName || 'Anonymous User',
+          userImage: user?.image || user?.photoURL || '',
         }),
       });
 
-      if (res.ok) {
-        const savedComment = await res.json();
-        setComments((prev) => [savedComment, ...prev]);
+      const data = await res.json();
+
+      if (res.ok && data.comment) {
+        // Append data.comment (not the raw wrapper object)
+        setComments((prev) => [data.comment, ...prev]);
       } else {
         toast.error('Failed to post comment.');
         setCommentText(temporaryText);
@@ -346,8 +412,11 @@ export default function LessonDetailsPage({ params }) {
                 <Share2 className="w-4 h-4 text-amber-600" /> Share
               </button>
 
-              <button className="font-bold text-xs text-rose-600 hover:text-rose-700 flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors">
-                <Flag className="w-4 h-4" /> Report
+              <button
+                onClick={() => setIsReportModalOpen(true)}
+                className="font-bold text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+              >
+                <Flag className="w-4 h-4 text-rose-600" /> Report
               </button>
             </div>
           </div>
@@ -411,16 +480,39 @@ export default function LessonDetailsPage({ params }) {
           </form>
 
           {/* Comment List */}
+          {/* Comment List */}
           <div className="space-y-4">
             {comments.length === 0 ? (
               <p className="text-xs text-gray-500 italic">No comments yet. Be the first to share your view!</p>
             ) : (
               comments.map((item, idx) => (
-                <div key={item._id || item.id || idx} className="p-4 rounded-2xl bg-amber-50/50 border border-amber-100">
-                  <p className="text-sm text-gray-800">{item.text}</p>
-                  <span className="text-[10px] text-gray-400 mt-2 block">
-                    {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Just now'}
-                  </span>
+                <div
+                  key={item._id || item.id || idx}
+                  className="p-4 rounded-2xl bg-amber-50/50 border border-amber-100 flex gap-3 items-start"
+                >
+                  {item.userImage && (
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden shrink-0 border border-amber-200">
+                      <Image
+                        src={item.userImage}
+                        alt={item.userName || 'User'}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-gray-900">
+                        {item.userName || item.userEmail || 'Anonymous'}
+                      </span>
+                      <span className="text-[10px] text-gray-400">
+                        {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Just now'}
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-800 leading-relaxed">
+                      {item.text || item.comment || ''}
+                    </p>
+                  </div>
                 </div>
               ))
             )}
@@ -438,6 +530,54 @@ export default function LessonDetailsPage({ params }) {
             {relatedLessons.map((item) => (
               <LessonCard key={item._id} lesson={item} />
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Report Modal Popup */}
+      {isReportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-amber-100">
+            <h3 className="text-xl font-black text-gray-900 mb-2 flex items-center gap-2">
+              <Flag className="w-5 h-5 text-rose-600" /> Report Lesson
+            </h3>
+            <p className="text-xs text-gray-500 mb-6">
+              Help us keep the community safe. Please select why you are reporting this lesson.
+            </p>
+
+            <form onSubmit={handleReportSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 mb-2">Reason</label>
+                <select
+                  value={reportReason}
+                  onChange={(e) => setReportReason(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl border border-amber-200 text-sm text-gray-800 bg-amber-50/30 outline-hidden focus:ring-2 focus:ring-amber-400"
+                >
+                  <option value="Inappropriate content">Inappropriate content</option>
+                  <option value="Spam or misleading">Spam or misleading</option>
+                  <option value="Copyright violation">Copyright violation</option>
+                  <option value="Harassment or hate speech">Harassment or hate speech</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => setIsReportModalOpen(false)}
+                  className="px-4 py-2 text-xs font-bold text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingReport}
+                  className="px-5 py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  {isSubmittingReport ? 'Submitting...' : 'Submit Report'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
