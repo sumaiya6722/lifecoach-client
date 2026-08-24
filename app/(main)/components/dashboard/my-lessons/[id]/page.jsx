@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
 import {
   Sparkles,
   Calendar,
@@ -100,12 +101,12 @@ export default function LessonDetailsPage({ params }) {
       if (!res.ok) {
         setIsLiked(!newLikedState);
         setLikesCount(likesCount);
-        console.error('Failed to update likes on server.');
+        toast.error('Failed to update likes on server.');
       }
     } catch (error) {
       setIsLiked(!newLikedState);
       setLikesCount(likesCount);
-      console.error('Error toggling like:', error);
+      toast.error('Error toggling like:', error);
     }
   };
 
@@ -171,7 +172,7 @@ export default function LessonDetailsPage({ params }) {
         const savedComment = await res.json();
         setComments((prev) => [savedComment, ...prev]);
       } else {
-        console.error('Failed to post comment.');
+        toast.error('Failed to post comment.');
         setCommentText(temporaryText);
       }
     } catch (error) {
@@ -373,14 +374,14 @@ export default function LessonDetailsPage({ params }) {
               </div>
             </div>
 
-            {lesson.creator?.userId && (
+            {lesson.creator?.userId || lesson.creator?.email ? (
               <Link
-                href={`/components/profile/${lesson.creator.userId}`}
+                href={`/components/profile/${lesson.creator.userId || lesson.creator.email}`}
                 className="px-4 py-2 text-xs border border-amber-400 text-amber-900 font-bold rounded-xl hover:bg-amber-100 transition-colors"
               >
                 View All Lessons
               </Link>
-            )}
+            ) : null}
           </div>
         </div>
 

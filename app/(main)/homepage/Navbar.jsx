@@ -9,10 +9,10 @@ const Navbar = () => {
   const pathname = usePathname();
   const { data: session } = authClient.useSession();
   const user = session?.user;
-  console.log(user);
+  const isAdmin = user?.role === 'admin';
 
-
-  const links = (
+  // Links for Regular Users
+  const userLinks = (
     <>
       <li>
         <Link href="/" className={pathname === '/' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
@@ -30,7 +30,7 @@ const Navbar = () => {
         </Link>
       </li>
       <li>
-        <Link href="/components/dashboard/my-favorites" className={pathname === '/pricing' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
+        <Link href="/components/dashboard/my-favorites" className={pathname === '/components/dashboard/my-favorites' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
           My Favorites
         </Link>
       </li>
@@ -39,6 +39,42 @@ const Navbar = () => {
           Pricing
         </Link>
       </li>
+    </>
+  );
+
+  // Links for Admins
+  const adminLinks = (
+    <>
+      <li>
+        <Link href="/" className={pathname === '/' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
+          Home
+        </Link>
+      </li>
+      <li>
+        <Link href="/components/dashboard/admin" className={pathname === '/components/dashboard/admin' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
+          Admin Dashboard
+        </Link>
+      </li>
+      <li>
+        <Link href="/components/dashboard/admin/manage-users" className={pathname === '/components/dashboard/manage-users' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
+          Manage Users
+        </Link>
+      </li>
+      <li>
+        <Link href="/components/dashboard/admin/manage-lessons" className={pathname === '/components/dashboard/manage-lessons' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
+          Manage Lessons
+        </Link>
+      </li>
+      <li>
+        <Link href="/components/dashboard/admin/reported-lessons" className={pathname === '/components/dashboard/reported-lessons' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
+          Reported Lessons
+        </Link>
+      </li>
+      {/* <li>
+        <Link href="/components/dashboard/adminProfile" className={pathname === '/components/dashboard/adminProfile' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
+          Admin Profile
+        </Link>
+      </li> */}
     </>
   );
 
@@ -63,7 +99,7 @@ const Navbar = () => {
               tabIndex={0}
               className="menu menu-sm dropdown-content bg-base-100 rounded-box z-50 mt-3 w-52 p-2 shadow-lg border border-gray-100"
             >
-              {links}
+              {isAdmin ? adminLinks : userLinks}
             </ul>
           </div>
 
@@ -89,7 +125,7 @@ const Navbar = () => {
         {/* Navbar Center: Desktop Links */}
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1 gap-2 text-sm font-medium">
-            {links}
+            {isAdmin ? adminLinks : userLinks}
           </ul>
         </div>
 
@@ -109,21 +145,39 @@ const Navbar = () => {
                   </div>
                 </div>
 
-                <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-lg bg-base-100 rounded-box w-52 border border-gray-100">
+                <ul tabIndex={0} className="menu menu-sm dropdown-content mt-3 z-50 p-2 shadow-lg bg-base-100 rounded-box w-56 border border-gray-100">
                   <li className="px-3 py-2 border-b border-gray-100">
-                    <p className="font-bold text-gray-800 p-0">{user?.name}</p>
+                    <div className="flex items-center justify-between p-0">
+                      <p className="font-bold text-gray-800 p-0">{user?.name}</p>
+                      {isAdmin && <span className="badge badge-sm badge-warning text-xs font-bold">Admin</span>}
+                    </div>
                     <p className="text-xs text-gray-500 p-0 truncate">{user?.email}</p>
                   </li>
-                  <li className="mt-2"><Link href="/components/dashboard">Dashboard</Link></li>
-                  <li><Link href="/components/dashboard/add-lesson">Add Lesson</Link></li>
-                  <li><Link href="/components/dashboard/my-lessons">My Lessons</Link></li>
-                  <li><Link href="/components/dashboard/userProfile">My Profile</Link></li>
-                  <li>
-                    <Link href="/components/dashboard/my-favorites" className="flex items-center justify-between">
-                      My Favorites
-                      <span className="badge badge-sm badge-rose">New</span>
-                    </Link>
-                  </li>
+
+                  {/* Dropdown Options */}
+                  {isAdmin ? (
+                    <>
+                      <li className="mt-2"><Link href="/components/dashboard/admin">Admin Dashboard</Link></li>
+                      <li><Link href="/components/dashboard/admin/manage-users">Manage Users</Link></li>
+                      <li><Link href="/components/dashboard/admin/manage-lessons">Manage Lessons</Link></li>
+                      <li><Link href="/components/dashboard/admin/reported-lessons">Reported Lessons</Link></li>
+                      <li><Link href="/components/dashboard/admin/profile">Admin Profile</Link></li>
+                    </>
+                  ) : (
+                    <>
+                      <li className="mt-2"><Link href="/components/dashboard">Dashboard</Link></li>
+                      <li><Link href="/components/dashboard/add-lesson">Add Lesson</Link></li>
+                      <li><Link href="/components/dashboard/my-lessons">My Lessons</Link></li>
+                      <li><Link href="/components/dashboard/userProfile">My Profile</Link></li>
+                      <li>
+                        <Link href="/components/dashboard/my-favorites" className="flex items-center justify-between">
+                          My Favorites
+                          <span className="badge badge-sm badge-rose">New</span>
+                        </Link>
+                      </li>
+                    </>
+                  )}
+
                   <li className="border-t border-gray-100 mt-1 pt-1">
                     <button onClick={signOut} className="text-error hover:bg-error/10 w-full text-left">
                       Logout
