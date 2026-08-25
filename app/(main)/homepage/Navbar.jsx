@@ -56,7 +56,7 @@ const Navbar = () => {
         </Link>
       </li>
       <li>
-        <Link href="/components/dashboard/admin/manage-users" className={pathname === '/components/dashboard/manage-users' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
+        <Link href="/components/dashboard/admin/manage-user" className={pathname === '/components/dashboard/manage-users' ? "text-emerald-600 font-semibold" : 'text-gray-600'}>
           Manage Users
         </Link>
       </li>
@@ -158,7 +158,7 @@ const Navbar = () => {
                   {isAdmin ? (
                     <>
                       <li className="mt-2"><Link href="/components/dashboard/admin">Admin Dashboard</Link></li>
-                      <li><Link href="/components/dashboard/admin/manage-users">Manage Users</Link></li>
+                      <li><Link href="/components/dashboard/admin/manage-user">Manage Users</Link></li>
                       <li><Link href="/components/dashboard/admin/manage-lessons">Manage Lessons</Link></li>
                       <li><Link href="/components/dashboard/admin/reported-lessons">Reported Lessons</Link></li>
                       <li><Link href="/components/dashboard/admin/profile">Admin Profile</Link></li>
