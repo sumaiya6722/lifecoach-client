@@ -13,7 +13,7 @@ export default function MostSavedLessonsSection() {
 
     async function fetchSavedLessons() {
       try {
-        const res = await fetch('http://localhost:5000/homepage/most-saved-lessons');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/most-saved-lessons`);
         if (res.ok) {
           const data = await res.json();
           if (isMounted) setLessons(data);

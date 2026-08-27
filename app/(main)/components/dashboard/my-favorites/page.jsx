@@ -22,7 +22,7 @@ export default function MyFavoritesPage() {
 
       try {
         const res = await fetch(
-          `http://localhost:5000/dashboard/my-favorites/${user?.id || user?.email}?email=${user?.email}`
+          `${process.env.NEXT_PUBLIC_API_URL}/dashboard/my-favorites/${user?.id || user?.email}?email=${user?.email}`
         );
 
         if (!res.ok) {
@@ -46,7 +46,7 @@ export default function MyFavoritesPage() {
   // Remove Favorite Handler
   const handleRemoveFavorite = async (lessonId) => {
     try {
-      const res = await fetch('http://localhost:5000/dashboard/my-favorites/remove', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/my-favorites/remove`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ lessonId, userId: userId || userEmail })

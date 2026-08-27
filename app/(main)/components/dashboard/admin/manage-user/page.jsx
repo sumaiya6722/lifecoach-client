@@ -16,7 +16,7 @@ export default function ManageUsersPage() {
 
     async function fetchUsers() {
       try {
-        const res = await fetch('http://localhost:5000/admin/users');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users`);
         if (res.ok) {
           const data = await res.json();
           if (isMounted) setUsers(data);
@@ -44,7 +44,7 @@ export default function ManageUsersPage() {
     if (!window.confirm(confirmMsg)) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/admin/users/${userId}/role`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}/role`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ role: newRole }),
@@ -71,7 +71,7 @@ export default function ManageUsersPage() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/admin/users/${userId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/users/${userId}`, {
         method: 'DELETE',
       });
 

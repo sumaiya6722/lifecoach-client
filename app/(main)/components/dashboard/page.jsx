@@ -51,7 +51,7 @@ export default function DashboardHome() {
 
         // 1. Fetch User Stats (Created & Favorites Count)
         const statsRes = await fetch(
-          `http://localhost:5000/dashboard/stats?email=${user.email}&userId=${user.id || user.email}`
+          `${process.env.NEXT_PUBLIC_API_URL}/dashboard/stats?email=${user.email}&userId=${user.id || user.email}`
         );
         if (statsRes.ok) {
           const statsData = await statsRes.json();
@@ -60,7 +60,7 @@ export default function DashboardHome() {
 
         // 2. Fetch Recent Lessons created by user
         const recentRes = await fetch(
-          `http://localhost:5000/dashboard/recent-lessons?email=${user.email}&limit=4`
+          `${process.env.NEXT_PUBLIC_API_URL}/dashboard/recent-lessons?email=${user.email}&limit=4`
         );
         if (recentRes.ok) {
           const recentData = await recentRes.json();

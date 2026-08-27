@@ -20,7 +20,7 @@ import {
   UserCheck,
   Edit
 } from 'lucide-react';
-import LessonCard from '@/app/(main)/components/cards/LessonCard';
+// import LessonCard from '@/app/(main)/components/cards/LessonCard';
 import { useSession, authClient } from '../../../../../lib/auth-client';
 
 export default function LessonDetailsPage({ params }) {
@@ -63,7 +63,7 @@ export default function LessonDetailsPage({ params }) {
     async function fetchLesson() {
       try {
         const headers = await getAuthHeaders();
-        const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`, { headers });
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons/${id}`, { headers });
 
         if (res.ok) {
           const data = await res.json();
@@ -103,7 +103,7 @@ export default function LessonDetailsPage({ params }) {
 
     try {
       const headers = await getAuthHeaders();
-      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/like`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons/${id}/like`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify({ action: newLikedState ? 'like' : 'unlike' }),
@@ -138,7 +138,7 @@ export default function LessonDetailsPage({ params }) {
 
     try {
       const headers = await getAuthHeaders();
-      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/favorite`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons/${id}/favorite`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify({ userId: userIdentifier, email: user?.email }),
@@ -166,7 +166,7 @@ export default function LessonDetailsPage({ params }) {
 
     try {
       const headers = await getAuthHeaders();
-      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/comments`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons/${id}/comments`, {
         method: 'POST',
         headers,
         body: JSON.stringify({
@@ -205,7 +205,7 @@ export default function LessonDetailsPage({ params }) {
 
     try {
       const headers = await getAuthHeaders();
-      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/report`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons/${id}/report`, {
         method: 'POST',
         headers,
         body: JSON.stringify({

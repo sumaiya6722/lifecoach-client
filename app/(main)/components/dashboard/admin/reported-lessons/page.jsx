@@ -25,7 +25,7 @@ export default function ReportedLessonsPage() {
 
     async function fetchReportedLessons() {
       try {
-        const res = await fetch('http://localhost:5000/admin/reported-lessons');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/reported-lessons`);
         if (res.ok) {
           const data = await res.json();
           if (isMounted) setLessons(data);
@@ -48,7 +48,7 @@ export default function ReportedLessonsPage() {
   // Action: Ignore reports and clear flags
   const handleIgnoreReports = async (lessonId) => {
     try {
-      const res = await fetch(`http://localhost:5000/admin/reported-lessons/${lessonId}/ignore`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/reported-lessons/${lessonId}/ignore`, {
         method: 'PATCH',
       });
 
@@ -72,7 +72,7 @@ export default function ReportedLessonsPage() {
     }
 
     try {
-      const res = await fetch(`http://localhost:5000/admin/reported-lessons/${lessonId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/reported-lessons/${lessonId}`, {
         method: 'DELETE',
       });
 

@@ -19,7 +19,7 @@ export default function EditProfilePage() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const res = await fetch(`http://localhost:5000/users/email/${userEmail}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/email/${userEmail}`);
         if (res.ok) {
           const data = await res.json();
           setName(data.name || '');
@@ -44,7 +44,7 @@ export default function EditProfilePage() {
     setMessage('');
 
     try {
-      const res = await fetch(`http://localhost:5000/users/email/${encodeURIComponent(email)}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/email/${encodeURIComponent(email)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

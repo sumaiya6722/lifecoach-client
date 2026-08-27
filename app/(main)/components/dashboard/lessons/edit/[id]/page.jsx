@@ -44,7 +44,7 @@ export default function EditLessonPage({ params }) {
     async function fetchLesson() {
       try {
         const headers = await getAuthHeaders();
-        const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons/${id}`, {
           headers
         });
 
@@ -86,7 +86,7 @@ export default function EditLessonPage({ params }) {
 
     try {
       const headers = await getAuthHeaders();
-      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons/${id}`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify(formData),

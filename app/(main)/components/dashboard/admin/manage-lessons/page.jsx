@@ -37,7 +37,7 @@ export default function ManageLessonsPage() {
           flagged: onlyFlagged.toString(),
         });
 
-        const res = await fetch(`http://localhost:5000/admin/lessons?${queryParams}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/lessons?${queryParams}`);
         if (res.ok) {
           const data = await res.json();
           if (isMounted) {

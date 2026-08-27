@@ -12,7 +12,7 @@ export default function TopContributorsSection() {
     let isMounted = true;
     async function fetchContributors() {
       try {
-        const res = await fetch('http://localhost:5000/homepage/top-contributors-week');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homepage/top-contributors-week`);
         if (res.ok) {
           const data = await res.json();
           if (isMounted) setContributors(data);

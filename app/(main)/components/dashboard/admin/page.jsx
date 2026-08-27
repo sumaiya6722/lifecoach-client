@@ -27,7 +27,7 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function fetchAdminStats() {
       try {
-        const res = await fetch('http://localhost:5000/admin/stats');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/stats`);
         if (res.ok) {
           const data = await res.json();
           setStats(data);

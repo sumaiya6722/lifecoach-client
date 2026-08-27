@@ -4,7 +4,7 @@ import LessonCard from "../../cards/LessonCard";
 
 const MyLessons = async () => {
 
-  const lessons = await fetch(`http://localhost:5000/dashboard/lessons`).then(res => res.json());
+  const lessons = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons`).then(res => res.json());
 
   return (
     <div className="flex flex-col items-center container mx-auto">

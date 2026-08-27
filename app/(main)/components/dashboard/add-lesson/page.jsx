@@ -64,7 +64,7 @@ export default function AddLessonPage() {
     };
 
     try {
-      const res = await fetch('http://localhost:5000/dashboard/lessons', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',

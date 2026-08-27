@@ -34,7 +34,7 @@ export default function AdminProfilePage() {
 
     if (!email) return;
 
-    fetch(`http://localhost:5000/admin/profile?email=${encodeURIComponent(email)}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/profile?email=${encodeURIComponent(email)}`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (isMounted && data) {
@@ -99,7 +99,7 @@ function ProfileContent({ session, activity, saving, setSaving }) {
         });
       }
 
-      const res = await fetch('http://localhost:5000/admin/profile/update', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/profile/update`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, name, photoURL }),

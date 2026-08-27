@@ -13,7 +13,7 @@ export default function UserProfilePage({ params }) {
   useEffect(() => {
     async function fetchUserLessons() {
       try {
-        const res = await fetch(`http://localhost:5000/dashboard/lessons/user/${userId}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/lessons/user/${userId}`);
         if (res.ok) {
           const data = await res.json();
           setLessons(data);

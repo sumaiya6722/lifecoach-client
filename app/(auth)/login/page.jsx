@@ -120,31 +120,7 @@ export default function LogIn() {
                 <FieldError />
               </TextField>
 
-              {/* <div className="flex flex-col gap-2 my-2">
-                <Label className="font-bold text-sm text-gray-800">Account Role</Label>
-                <div className="flex items-center gap-6 bg-white/70 p-3 rounded-lg border border-blue-300">
-                  <label className="flex items-center gap-2 cursor-pointer font-semibold text-gray-700">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="user"
-                      defaultChecked
-                      className="accent-amber-500 w-4 h-4 cursor-pointer"
-                    />
-                    User
-                  </label>
-
-                  <label className="flex items-center gap-2 cursor-pointer font-semibold text-gray-700">
-                    <input
-                      type="radio"
-                      name="role"
-                      value="admin"
-                      className="accent-amber-500 w-4 h-4 cursor-pointer"
-                    />
-                    Admin
-                  </label>
-                </div>
-              </div> */}
+              
             </FieldGroup>
 
             {/* Form Actions */}

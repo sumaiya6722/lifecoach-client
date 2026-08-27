@@ -12,7 +12,7 @@ export default function FeaturedLessons() {
   useEffect(() => {
     let isMounted = true;
 
-    fetch('http://localhost:5000/lessons/featured')
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/lessons/featured`)
       .then((res) => (res.ok ? res.json() : []))
       .then((data) => {
         if (isMounted) {

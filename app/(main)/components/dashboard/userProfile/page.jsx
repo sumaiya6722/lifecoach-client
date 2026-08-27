@@ -47,7 +47,7 @@ export default function ProfilePage() {
       try {
         setLoadingLessons(true);
         const res = await fetch(
-          `http://localhost:5000/dashboard/user-lessons?email=${encodeURIComponent(user.email)}`
+          `${process.env.NEXT_PUBLIC_API_URL}/dashboard/user-lessons?email=${encodeURIComponent(user.email)}`
         );
 
         if (res.ok) {
@@ -78,7 +78,7 @@ export default function ProfilePage() {
     setSaving(true);
 
     try {
-      const res = await fetch('http://localhost:5000/dashboard/users/profile', {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/dashboard/users/profile`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
