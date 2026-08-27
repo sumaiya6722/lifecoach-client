@@ -54,7 +54,7 @@ export default function FeaturedLessons() {
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
             Curated Insights
           </div>
-          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight dark:text-white">
             Featured Life Lessons
           </h2>
           <p className="text-sm text-gray-500 mt-2 max-w-xl">
@@ -85,9 +85,9 @@ export default function FeaturedLessons() {
 
             {/* Thumbnail Image */}
             <div className="relative h-48 w-full bg-amber-50 overflow-hidden">
-              {lesson.image ? (
+              {lesson.imageUrl ? (
                 <Image
-                  src={lesson.image}
+                  src={lesson.imageUrl}
                   alt={lesson.title}
                   fill
                   unoptimized
@@ -118,15 +118,15 @@ export default function FeaturedLessons() {
               <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-7 h-7 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-bold text-xs">
-                    {lesson.authorName?.[0] || <User className="w-3.5 h-3.5" />}
+                    {lesson.creator.name?.[0] || <User className="w-3.5 h-3.5" />}
                   </div>
                   <span className="text-xs font-semibold text-gray-700">
-                    {lesson.authorName || 'Anonymous'}
+                    {lesson.creator.name || 'Anonymous'}
                   </span>
                 </div>
 
                 <Link
-                  href={`/lessons/${lesson._id}`}
+                  href={`/components/dashboard/my-lessons/${lesson._id}`}
                   className="px-4 py-2 rounded-xl bg-gray-900 text-white text-xs font-bold hover:bg-amber-500 transition-colors"
                 >
                   Read Lesson

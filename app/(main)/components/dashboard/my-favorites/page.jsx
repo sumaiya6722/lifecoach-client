@@ -77,7 +77,7 @@ export default function MyFavoritesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 flex items-center gap-2">
+          <h1 className="text-3xl font-black text-gray-900 flex items-center gap-2 dark:text-white">
             <Heart className="w-8 h-8 text-rose-500 fill-rose-500" />
             My Saved Favorites
           </h1>

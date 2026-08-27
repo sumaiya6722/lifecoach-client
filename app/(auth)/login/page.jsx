@@ -89,7 +89,7 @@ export default function LogIn() {
                 }}
               >
                 <Label className="text-xs font-bold uppercase tracking-wider text-gray-700">Email</Label>
-                <Input placeholder="john@example.com" className="w-full" />
+                <Input placeholder="john@example.com" className="w-full bg-gray-300 dark:text-black" />
                 <FieldError />
               </TextField>
 
@@ -113,7 +113,7 @@ export default function LogIn() {
                 }}
               >
                 <Label className="text-xs font-bold uppercase tracking-wider text-gray-700">Password</Label>
-                <Input placeholder="Enter your password" className="w-full" />
+                <Input placeholder="Enter your password" className="w-full bg-gray-300 dark:text-black" />
                 <Description className="text-[11px] text-gray-400">
                   Must be at least 8 characters with 1 uppercase & 1 number
                 </Description>

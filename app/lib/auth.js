@@ -1,6 +1,9 @@
 import { betterAuth } from "better-auth";
 import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
+import { jwt } from "better-auth/plugins"
+
+
 
 const client = new MongoClient(process.env.MONGO_URL);
 const db = client.db('lifecoach');
@@ -9,13 +12,13 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  user:{
-    additionalFields:{
-      role:{
-        default:'user'
+  user: {
+    additionalFields: {
+      role: {
+        default: 'user'
       },
-      plan:{
-        default:'user_free'
+      plan: {
+        default: 'user_free'
       },
       lessonsCount: {
         type: "number",
@@ -33,5 +36,8 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT,
       clientSecret: process.env.GOOGLE_SECRET,
     },
-  }
+  },
+  plugins: [
+    jwt(),
+  ]
 });

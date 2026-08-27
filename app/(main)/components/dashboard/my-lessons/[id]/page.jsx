@@ -21,24 +21,20 @@ import {
   Edit
 } from 'lucide-react';
 import LessonCard from '@/app/(main)/components/cards/LessonCard';
-import { useSession } from '../../../../../lib/auth-client';
+import { useSession, authClient } from '../../../../../lib/auth-client';
 
 export default function LessonDetailsPage({ params }) {
-  // Unwrap params using React.use()
   const { id } = use(params);
-
-  // Get active user session
   const { data: session, isPending } = useSession();
   const user = session?.user;
 
-  // Derive user premium status from plan
   const isUserPremium = user?.plan === 'user_premium' || user?.plan === 'admin_premium';
 
   // Component States
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Interactive Feature States with Counts
+  // Interactive States
   const [likesCount, setLikesCount] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
 
@@ -48,28 +44,152 @@ export default function LessonDetailsPage({ params }) {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState('');
 
-  // Interactive Feature States
   const [reportsCount, setReportsCount] = useState(0);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [reportReason, setReportReason] = useState('Inappropriate content');
   const [isSubmittingReport, setIsSubmittingReport] = useState(false);
 
-  // Populate initial report count in useEffect
+  // Helper to fetch authorization header
+  const getAuthHeaders = async () => {
+    const { data: tokenData } = await authClient.token();
+    return {
+      'Content-Type': 'application/json',
+      ...(tokenData?.token ? { Authorization: `Bearer ${tokenData.token}` } : {})
+    };
+  };
+
+  // Single Consolidated Fetch Effect
   useEffect(() => {
     async function fetchLesson() {
       try {
-        const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`);
+        const headers = await getAuthHeaders();
+        const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`, { headers });
+
         if (res.ok) {
           const data = await res.json();
-          // ... rest of your state setters
+          setLesson(data);
+          setLikesCount(data.likesCount || 0);
+          setFavoritesCount(data.favoritesCount || 0);
           setReportsCount(data.reportsCount || 0);
+          setComments(data.comments || []);
+          setIsLiked(data.isLikedByUser || false);
+
+          const userIdentifier = user?.id || user?.email;
+          const favorited = Array.isArray(data.favoritedBy) && data.favoritedBy.includes(userIdentifier);
+          setIsFavorited(favorited);
+        } else {
+          setLesson(null);
         }
       } catch (error) {
         console.error("Failed to fetch lesson:", error);
+        setLesson(null);
+      } finally {
+        setLoading(false);
       }
     }
-    if (id) fetchLesson();
-  }, [id, user?.id, user?.email]);
+
+    if (id && !isPending) {
+      fetchLesson();
+    }
+  }, [id, isPending, user?.id, user?.email]);
+
+  // Handler for Like Toggle
+  const handleLikeToggle = async () => {
+    const newLikedState = !isLiked;
+    const newLikesCount = newLikedState ? likesCount + 1 : likesCount - 1;
+
+    setIsLiked(newLikedState);
+    setLikesCount(newLikesCount);
+
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/like`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ action: newLikedState ? 'like' : 'unlike' }),
+      });
+
+      if (!res.ok) {
+        setIsLiked(!newLikedState);
+        setLikesCount(likesCount);
+        toast.error('Failed to update likes on server.');
+      }
+    } catch (error) {
+      setIsLiked(!newLikedState);
+      setLikesCount(likesCount);
+      toast.error('Error toggling like.');
+    }
+  };
+
+  // Handler for Favorite Toggle
+  const handleFavoriteToggle = async () => {
+    const userIdentifier = user?.id || user?.email;
+
+    if (!userIdentifier) {
+      toast.error('Please log in to save lessons');
+      return;
+    }
+
+    const newFavoriteState = !isFavorited;
+    const newFavoritesCount = newFavoriteState ? favoritesCount + 1 : favoritesCount - 1;
+
+    setIsFavorited(newFavoriteState);
+    setFavoritesCount(newFavoritesCount);
+
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/favorite`, {
+        method: 'PATCH',
+        headers,
+        body: JSON.stringify({ userId: userIdentifier, email: user?.email }),
+      });
+
+      if (!res.ok) {
+        setIsFavorited(!newFavoriteState);
+        setFavoritesCount(favoritesCount);
+        toast.error('Failed to update favorite status.');
+      }
+    } catch (error) {
+      setIsFavorited(!newFavoriteState);
+      setFavoritesCount(favoritesCount);
+      toast.error('Error toggling favorite.');
+    }
+  };
+
+  // Handler for Posting Comments
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    const temporaryText = commentText;
+    setCommentText('');
+
+    try {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/comments`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          text: temporaryText,
+          userEmail: user?.email || 'Anonymous',
+          userName: user?.name || user?.displayName || 'Anonymous User',
+          userImage: user?.image || user?.photoURL || '',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.comment) {
+        setComments((prev) => [data.comment, ...prev]);
+      } else {
+        toast.error('Failed to post comment.');
+        setCommentText(temporaryText);
+      }
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+      setCommentText(temporaryText);
+    }
+  };
 
   // Report Submission Handler
   const handleReportSubmit = async (e) => {
@@ -84,9 +204,10 @@ export default function LessonDetailsPage({ params }) {
     setIsSubmittingReport(true);
 
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/report`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           userId: user?.id,
           email: user?.email,
@@ -110,144 +231,6 @@ export default function LessonDetailsPage({ params }) {
     }
   };
 
-  // Fetch lesson data and existing interactions on mount
-  useEffect(() => {
-    async function fetchLesson() {
-      try {
-        const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`);
-        if (res.ok) {
-          const data = await res.json();
-          setLesson(data);
-
-          // Populate counts from database
-          setLikesCount(data.likesCount || 0);
-          setFavoritesCount(data.favoritesCount || 0);
-          setComments(data.comments || []);
-          setIsLiked(data.isLikedByUser || false);
-
-          // UPDATE 1: Check if the current user ID or email exists in favoritedBy array
-          const userIdentifier = user?.id || user?.email;
-          const favorited = Array.isArray(data.favoritedBy) && data.favoritedBy.includes(userIdentifier);
-          setIsFavorited(favorited);
-        } else {
-          setLesson(null);
-        }
-      } catch (error) {
-        console.error("Failed to fetch lesson:", error);
-        setLesson(null);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    if (id) {
-      fetchLesson();
-    }
-  }, [id, user?.id, user?.email]);
-
-  // Handler for Like Toggle with Counter Persistence
-  const handleLikeToggle = async () => {
-    const newLikedState = !isLiked;
-    const newLikesCount = newLikedState ? likesCount + 1 : likesCount - 1;
-
-    setIsLiked(newLikedState);
-    setLikesCount(newLikesCount);
-
-    try {
-      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/like`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: newLikedState ? 'like' : 'unlike' }),
-      });
-
-      if (!res.ok) {
-        setIsLiked(!newLikedState);
-        setLikesCount(likesCount);
-        toast.error('Failed to update likes on server.');
-      }
-    } catch (error) {
-      setIsLiked(!newLikedState);
-      setLikesCount(likesCount);
-      toast.error('Error toggling like:', error);
-    }
-  };
-
-  // UPDATE 2: Handler for Favorite Toggle passing user identifier
-  const handleFavoriteToggle = async () => {
-    const userIdentifier = user?.id || user?.email;
-
-    if (!userIdentifier) {
-      alert('Please log in to save lessons');
-      return;
-    }
-
-    const newFavoriteState = !isFavorited;
-    const newFavoritesCount = newFavoriteState ? favoritesCount + 1 : favoritesCount - 1;
-
-    // Optimistic UI Update
-    setIsFavorited(newFavoriteState);
-    setFavoritesCount(newFavoritesCount);
-
-    try {
-      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/favorite`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: userIdentifier,
-          email: user?.email
-        }),
-      });
-
-      if (!res.ok) {
-        // Rollback state if server request fails
-        setIsFavorited(!newFavoriteState);
-        setFavoritesCount(favoritesCount);
-        console.error('Failed to update favorite status on server.');
-      }
-    } catch (error) {
-      // Rollback state on error
-      setIsFavorited(!newFavoriteState);
-      setFavoritesCount(favoritesCount);
-      console.error('Error toggling favorite:', error);
-    }
-  };
-
-  // Handler for Posting Comments with Backend Persistence
-  const handleCommentSubmit = async (e) => {
-    e.preventDefault();
-    if (!commentText.trim()) return;
-
-    const temporaryText = commentText;
-    setCommentText('');
-
-    try {
-      const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: temporaryText,
-          userEmail: user?.email || 'Anonymous',
-          userName: user?.name || user?.displayName || 'Anonymous User',
-          userImage: user?.image || user?.photoURL || '',
-        }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.comment) {
-        // Append data.comment (not the raw wrapper object)
-        setComments((prev) => [data.comment, ...prev]);
-      } else {
-        toast.error('Failed to post comment.');
-        setCommentText(temporaryText);
-      }
-    } catch (error) {
-      console.error('Error submitting comment:', error);
-      setCommentText(temporaryText);
-    }
-  };
-
-  // Loading Skeleton State
   if (loading || isPending) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
@@ -257,7 +240,6 @@ export default function LessonDetailsPage({ params }) {
     );
   }
 
-  // Not Found State
   if (!lesson) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center">
@@ -271,14 +253,12 @@ export default function LessonDetailsPage({ params }) {
 
   const isPremiumLesson = lesson.accessLevel === 'Premium';
   const isLocked = isPremiumLesson && !isUserPremium;
-  const relatedLessons = [];
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-4 sm:px-6">
-
-      {/* Navigation & Header Badges */}
+      {/* Navigation Header */}
       <div className="flex items-center justify-between mb-6">
-        <div className='flex gap-2'>
+        <div className="flex gap-2">
           <Link
             href="/components/dashboard/my-lessons"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold bg-amber-100 text-amber-900 hover:bg-amber-200 transition-colors"
@@ -315,15 +295,12 @@ export default function LessonDetailsPage({ params }) {
         </div>
       </div>
 
-      {/* Main Container Card */}
+      {/* Main Content */}
       <div className="bg-white/90 backdrop-blur-md rounded-3xl border border-amber-200/80 shadow-xl overflow-hidden p-6 sm:p-10">
-
-        {/* Title */}
         <h1 className="text-3xl sm:text-4xl font-black text-gray-900 leading-tight mb-4">
           {lesson.title}
         </h1>
 
-        {/* Lesson Metadata */}
         <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-gray-500 border-b border-amber-100 pb-6 mb-8">
           <span className="flex items-center gap-1">
             <Calendar className="w-4 h-4 text-amber-500" />
@@ -339,7 +316,6 @@ export default function LessonDetailsPage({ params }) {
           </span>
         </div>
 
-        {/* Cover Image */}
         {lesson.imageUrl && (
           <div className="relative w-full h-80 sm:h-96 rounded-2xl overflow-hidden mb-8 shadow-md">
             <Image
@@ -352,13 +328,11 @@ export default function LessonDetailsPage({ params }) {
           </div>
         )}
 
-        {/* Content Story / Locked State */}
         <div className="relative">
           <div className={`prose max-w-none text-gray-800 text-lg leading-relaxed space-y-4 whitespace-pre-line ${isLocked ? 'blur-md select-none pointer-events-none' : ''}`}>
             {lesson.story}
           </div>
 
-          {/* Premium Overlay */}
           {isLocked && (
             <div className="absolute inset-0 bg-white/80 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center text-center p-8 border border-amber-300 shadow-2xl">
               <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mb-4">
@@ -378,29 +352,28 @@ export default function LessonDetailsPage({ params }) {
           )}
         </div>
 
-        {/* Interactive Action Buttons */}
         {!isLocked && (
           <div className="py-6 border-y border-amber-100 my-8 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              {/* Like Button */}
               <button
                 onClick={handleLikeToggle}
-                className={`font-bold flex items-center gap-2 px-5 py-2.5 rounded-xl border transition-all ${isLiked
-                  ? 'bg-rose-50 border-rose-300 text-rose-600'
-                  : 'bg-white border-amber-200 text-gray-700 hover:bg-amber-50'
-                  }`}
+                className={`font-bold flex items-center gap-2 px-5 py-2.5 rounded-xl border transition-all ${
+                  isLiked
+                    ? 'bg-rose-50 border-rose-300 text-rose-600'
+                    : 'bg-white border-amber-200 text-gray-700 hover:bg-amber-50'
+                }`}
               >
                 <Heart className={`w-5 h-5 ${isLiked ? 'fill-rose-500 text-rose-500' : 'text-rose-500'}`} />
                 {likesCount} Likes
               </button>
 
-              {/* Favorite Button with Live Counter */}
               <button
                 onClick={handleFavoriteToggle}
-                className={`font-bold flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${isFavorited
-                  ? 'bg-amber-100 border-amber-300 text-amber-900'
-                  : 'bg-white border-amber-200 text-gray-700 hover:bg-amber-50'
-                  }`}
+                className={`font-bold flex items-center gap-2 px-4 py-2.5 rounded-xl border transition-all ${
+                  isFavorited
+                    ? 'bg-amber-100 border-amber-300 text-amber-900'
+                    : 'bg-white border-amber-200 text-gray-700 hover:bg-amber-50'
+                }`}
               >
                 <Bookmark className={`w-4 h-4 ${isFavorited ? 'fill-amber-600 text-amber-600' : 'text-amber-600'}`} />
                 {favoritesCount} Favorites
@@ -416,7 +389,7 @@ export default function LessonDetailsPage({ params }) {
                 onClick={() => setIsReportModalOpen(true)}
                 className="font-bold text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
               >
-                <Flag className="w-4 h-4 text-rose-600" /> Report
+                <Flag className="w-4 h-4 text-rose-600" /> Report ({reportsCount})
               </button>
             </div>
           </div>
@@ -443,20 +416,19 @@ export default function LessonDetailsPage({ params }) {
               </div>
             </div>
 
-            {lesson.creator?.userId || lesson.creator?.email ? (
+            {(lesson.creator?.userId || lesson.creator?.email) && (
               <Link
                 href={`/components/profile/${lesson.creator.userId || lesson.creator.email}`}
                 className="px-4 py-2 text-xs border border-amber-400 text-amber-900 font-bold rounded-xl hover:bg-amber-100 transition-colors"
               >
                 View All Lessons
               </Link>
-            ) : null}
+            )}
           </div>
         </div>
-
       </div>
 
-      {/* Dynamic Comment Section */}
+      {/* Discussion Section */}
       {!isLocked && (
         <div className="mt-12 pt-8 border-t border-amber-100">
           <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
@@ -479,8 +451,6 @@ export default function LessonDetailsPage({ params }) {
             </button>
           </form>
 
-          {/* Comment List */}
-          {/* Comment List */}
           <div className="space-y-4">
             {comments.length === 0 ? (
               <p className="text-xs text-gray-500 italic">No comments yet. Be the first to share your view!</p>
@@ -520,21 +490,7 @@ export default function LessonDetailsPage({ params }) {
         </div>
       )}
 
-      {/* Recommended Grid */}
-      {relatedLessons.length > 0 && (
-        <div className="mt-16">
-          <h2 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-            <Sparkles className="w-6 h-6 text-amber-500" /> Recommended Lessons
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {relatedLessons.map((item) => (
-              <LessonCard key={item._id} lesson={item} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Report Modal Popup */}
+      {/* Report Modal */}
       {isReportModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs p-4">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-amber-100">
@@ -581,7 +537,6 @@ export default function LessonDetailsPage({ params }) {
           </div>
         </div>
       )}
-
     </div>
   );
 }

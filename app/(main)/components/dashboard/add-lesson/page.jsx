@@ -108,7 +108,7 @@ export default function AddLessonPage() {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/90 text-amber-900 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-amber-200/50">
             <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" /> Share Your Wisdom
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight dark:text-white">
             Create a New Life Lesson
           </h1>
           <p className="mt-2 text-gray-600 font-medium">

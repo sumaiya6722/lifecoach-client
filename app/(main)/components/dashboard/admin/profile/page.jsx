@@ -64,7 +64,7 @@ export default function AdminProfilePage() {
   return (
     <div className="max-w-5xl mx-auto py-8 px-4 sm:px-6 space-y-8">
       <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Admin Profile</h1>
+        <h1 className="text-3xl font-black text-gray-900 tracking-tight dark:text-white">Admin Profile</h1>
         <p className="text-xs sm:text-sm text-gray-500 mt-1">
           Manage your account credentials, view platform metrics, and update your public display identity.
         </p>

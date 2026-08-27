@@ -55,7 +55,7 @@ export default function AdminDashboardPage() {
       
       {/* Page Title */}
       <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Platform Dashboard</h1>
+        <h1 className="text-3xl font-black text-gray-900 tracking-tight dark:text-white">Platform Dashboard</h1>
         <p className="text-sm text-gray-500">Monitor platform metrics, content status, and user engagement.</p>
       </div>
 
@@ -66,7 +66,7 @@ export default function AdminDashboardPage() {
         <div className="p-6 rounded-3xl bg-amber-500/10 border border-amber-200 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Total Users</p>
-            <h3 className="text-3xl font-black text-gray-900 mt-1">{stats?.totalUsers || 0}</h3>
+            <h3 className="text-3xl font-black text-gray-900 mt-1 dark:text-white">{stats?.totalUsers || 0}</h3>
           </div>
           <div className="w-12 h-12 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-md">
             <Users className="w-6 h-6" />
@@ -77,7 +77,7 @@ export default function AdminDashboardPage() {
         <div className="p-6 rounded-3xl bg-blue-500/10 border border-blue-200 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-blue-800 uppercase tracking-wider">Public Lessons</p>
-            <h3 className="text-3xl font-black text-gray-900 mt-1">{stats?.totalPublicLessons || 0}</h3>
+            <h3 className="text-3xl font-black text-gray-900 mt-1 dark:text-white">{stats?.totalPublicLessons || 0}</h3>
           </div>
           <div className="w-12 h-12 bg-blue-500 text-white rounded-2xl flex items-center justify-center shadow-md">
             <BookOpen className="w-6 h-6" />
@@ -88,7 +88,7 @@ export default function AdminDashboardPage() {
         <div className="p-6 rounded-3xl bg-rose-500/10 border border-rose-200 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-rose-800 uppercase tracking-wider">Flagged / Reported</p>
-            <h3 className="text-3xl font-black text-gray-900 mt-1">{stats?.totalReportedLessons || 0}</h3>
+            <h3 className="text-3xl font-black text-gray-900 mt-1 dark:text-white">{stats?.totalReportedLessons || 0}</h3>
           </div>
           <div className="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center shadow-md">
             <Flag className="w-6 h-6" />
@@ -99,7 +99,7 @@ export default function AdminDashboardPage() {
         <div className="p-6 rounded-3xl bg-emerald-500/10 border border-emerald-200 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-emerald-800 uppercase tracking-wider">New Today</p>
-            <h3 className="text-3xl font-black text-gray-900 mt-1">{stats?.todaysNewLessons || 0}</h3>
+            <h3 className="text-3xl font-black text-gray-900 mt-1 dark:text-white">{stats?.todaysNewLessons || 0}</h3>
           </div>
           <div className="w-12 h-12 bg-emerald-500 text-white rounded-2xl flex items-center justify-center shadow-md">
             <Calendar className="w-6 h-6" />

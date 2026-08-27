@@ -44,7 +44,7 @@ export default function TopContributorsSection() {
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100/70 border border-amber-200 text-amber-800 text-xs font-bold mb-3 shadow-xs">
           <Sparkles className="w-3.5 h-3.5 text-amber-600 animate-pulse" /> Weekly Leaderboard
         </div>
-        <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight flex items-center gap-2.5">
+        <h2 className="text-3xl dark:text-white sm:text-4xl font-black text-gray-900 tracking-tight flex items-center gap-2.5">
           <Award className="w-8 h-8 text-amber-500 animate-bounce" /> Top Contributors of the Week
         </h2>
         <p className="text-xs sm:text-sm text-gray-500 mt-1">

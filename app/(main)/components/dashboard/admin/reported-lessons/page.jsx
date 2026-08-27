@@ -103,7 +103,7 @@ export default function ReportedLessonsPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-2.5">
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight dark:text-white flex items-center gap-2.5">
             <ShieldAlert className="w-8 h-8 text-rose-600" /> Reported Lessons
           </h1>
           <p className="text-xs sm:text-sm text-gray-500 mt-1">

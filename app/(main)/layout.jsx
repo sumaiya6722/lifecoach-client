@@ -1,5 +1,6 @@
 import Navbar from './homepage/Navbar';
 import Footer from './homepage/Footer';
+// import { ThemeProvider } from '@/components/ThemeProvider';
 
 export default function MainLayout({ children }) {
   return (

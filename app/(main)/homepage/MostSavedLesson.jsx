@@ -55,7 +55,7 @@ export default function MostSavedLessonsSection() {
       {/* Clean Header */}
       <div className="mb-6 border-b border-amber-100 pb-4 flex items-center justify-between">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+          <h2 className="text-4xl sm:text-3xl font-black dark:text-white text-gray-900 tracking-tight flex items-center gap-2">
             <Bookmark className="w-6 h-6 text-amber-500 fill-amber-500" /> Most Saved Lessons
           </h2>
           <p className="text-xs sm:text-sm text-gray-500 mt-0.5">

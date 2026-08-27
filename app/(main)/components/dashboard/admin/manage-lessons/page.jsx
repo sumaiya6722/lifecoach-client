@@ -133,7 +133,7 @@ export default function ManageLessonsPage() {
 
       {/* Title Header */}
       <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Manage Lessons</h1>
+        <h1 className="text-3xl font-black text-gray-900 tracking-tight dark:text-white">Manage Lessons</h1>
         <p className="text-sm text-gray-500">Review content, moderate reported posts, and manage home page featured lessons.</p>
       </div>
 
@@ -142,7 +142,7 @@ export default function ManageLessonsPage() {
         <div className="p-6 rounded-3xl bg-blue-500/10 border border-blue-200 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-blue-800 uppercase tracking-wider">Public Lessons</p>
-            <h3 className="text-3xl font-black text-gray-900 mt-1">{stats.publicCount}</h3>
+            <h3 className="text-3xl font-black text-gray-900 mt-1 dark:text-white">{stats.publicCount}</h3>
           </div>
           <div className="w-12 h-12 bg-blue-500 text-white rounded-2xl flex items-center justify-center shadow-md">
             <BookOpen className="w-6 h-6" />
@@ -152,7 +152,7 @@ export default function ManageLessonsPage() {
         <div className="p-6 rounded-3xl bg-amber-500/10 border border-amber-200 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-amber-800 uppercase tracking-wider">Private Lessons</p>
-            <h3 className="text-3xl font-black text-gray-900 mt-1">{stats.privateCount}</h3>
+            <h3 className="text-3xl font-black text-gray-900 mt-1 dark:text-white">{stats.privateCount}</h3>
           </div>
           <div className="w-12 h-12 bg-amber-500 text-white rounded-2xl flex items-center justify-center shadow-md">
             <Lock className="w-6 h-6" />
@@ -162,7 +162,7 @@ export default function ManageLessonsPage() {
         <div className="p-6 rounded-3xl bg-rose-500/10 border border-rose-200 flex items-center justify-between">
           <div>
             <p className="text-xs font-bold text-rose-800 uppercase tracking-wider">Flagged / Reported</p>
-            <h3 className="text-3xl font-black text-gray-900 mt-1">{stats.flaggedCount}</h3>
+            <h3 className="text-3xl font-black text-gray-900 mt-1 dark:text-white">{stats.flaggedCount}</h3>
           </div>
           <div className="w-12 h-12 bg-rose-500 text-white rounded-2xl flex items-center justify-center shadow-md">
             <Flag className="w-6 h-6" />

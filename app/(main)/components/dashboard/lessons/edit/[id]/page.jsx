@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Sparkles, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
-import { useSession } from '../../../../../../lib/auth-client';
+import { useSession, authClient } from '../../../../../../lib/auth-client';
 
 export default function EditLessonPage({ params }) {
   const { id } = use(params);
@@ -30,11 +30,24 @@ export default function EditLessonPage({ params }) {
   const categories = ['Personal Growth', 'Career', 'Relationships', 'Mindset', 'Mistakes Learned'];
   const emotionalTones = ['Motivational', 'Sad', 'Realization', 'Gratitude'];
 
-  // Fetch pre-filled data on page load
+  // Helper to fetch authorization header safely
+  const getAuthHeaders = async () => {
+    const { data: tokenData } = await authClient.token();
+    return {
+      'Content-Type': 'application/json',
+      ...(tokenData?.token ? { Authorization: `Bearer ${tokenData.token}` } : {})
+    };
+  };
+
+  // Fetch pre-filled data on page load with token
   useEffect(() => {
     async function fetchLesson() {
       try {
-        const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`);
+        const headers = await getAuthHeaders();
+        const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`, {
+          headers
+        });
+
         if (res.ok) {
           const data = await res.json();
           setFormData({
@@ -57,8 +70,10 @@ export default function EditLessonPage({ params }) {
       }
     }
 
-    if (id) fetchLesson();
-  }, [id]);
+    if (id && !isPending) {
+      fetchLesson();
+    }
+  }, [id, isPending]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -70,18 +85,18 @@ export default function EditLessonPage({ params }) {
     setSubmitting(true);
 
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch(`http://localhost:5000/dashboard/lessons/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(formData),
       });
 
       if (res.ok) {
         toast.success('Lesson updated successfully!');
-        // Wait 1.5 seconds so the user can read the toast before redirecting
         setTimeout(() => {
           router.push(`/components/dashboard/my-lessons/${id}`);
-        }, 3500);
+        }, 1500);
       } else {
         toast.error('Failed to update lesson.');
       }
@@ -107,7 +122,7 @@ export default function EditLessonPage({ params }) {
 
         {/* Top Cancel Link */}
         <Link
-          href={`/dashboard/lessons/${id}`}
+          href={`/components/dashboard/my-lessons/${id}`}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm font-bold bg-amber-100 text-amber-900 hover:bg-amber-200 transition-colors mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Cancel & Go Back
@@ -118,7 +133,7 @@ export default function EditLessonPage({ params }) {
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/90 text-amber-900 text-xs font-bold uppercase tracking-wider mb-3 shadow-sm border border-amber-200/50">
             <Sparkles className="w-3.5 h-3.5 text-amber-600" /> Update Wisdom
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight dark:text-white">
             Edit Your Life Lesson
           </h1>
         </div>
