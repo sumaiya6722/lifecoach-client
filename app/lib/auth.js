@@ -30,7 +30,12 @@ export const auth = betterAuth({
     // Optional: if you don't provide a client, database transactions won't be enabled.
     client
   }),
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: process.env.BETTER_AUTH_URL || "https://lifecoach-client.vercel.app",
+  trustedOrigins: [
+    "https://lifecoach-client.vercel.app",
+    "https://lifecoach-client-git-main-sumaiyaali6722-8173s-projects.vercel.app",
+    "http://localhost:3000"
+  ],
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT,
